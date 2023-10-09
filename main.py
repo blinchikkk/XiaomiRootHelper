@@ -10,6 +10,13 @@ def run_fastboot_command():
     except subprocess.CalledProcessError as e:
         print(f"Ошибка выполнения команды fastboot: {e.output}")
 
+def twrp_method_1(image):
+    try:
+        output = subprocess.check_output(['fastboot', 'flash', 'recovery', image], stderr=subprocess.STDOUT, text=True)
+        print(output)
+    except subprocess.CalledProcessError as e:
+        print(f"Ошибка выполнения команды fastboot: {e.output}")
+
 def main():
     while active is True:        
         print('[1] Посмотреть устройства в FastBoot.\n'
@@ -24,6 +31,18 @@ def main():
         if check_path:
             if answer == 1:
                 run_fastboot_command()
+            
+            elif answer == 2:
+                check_path = os.path.exists(os.path.join(os.path.dirname(__file__), 'recovery.img'))
+                if check_path:
+                    print('[1] fastboot flash recovery (Безопастно).\n'
+                        '[2] fastboot flash recovery_ab (Менее безопастно).\n')
+                    answer = int(input('Ваш выбор: '))
+                else:
+                    print('Ошибка! Образ Recovery не найден. Пожалуйста убедитесь что файл называется recovery.img и находится в папке "images"')
+                
+                    
+                
         else:
             print('Ошибка! fastboot.exe не найден!')
                 
