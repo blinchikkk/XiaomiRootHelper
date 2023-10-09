@@ -1,67 +1,64 @@
 import os
 import subprocess
+import sys
 
-active = True
+def check_file_exists(file_path):
+    return os.path.exists(file_path)
 
 
 def run_fastboot_command():
     try:
-        output = subprocess.check_output(
-            ['fastboot', 'devices'], stderr=subprocess.STDOUT, text=True)
-        print(output)
+        process = subprocess.Popen(['fastboot', 'devices'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+        while True:
+            output = process.stdout.readline()
+            if not output and process.poll() is not None:
+                break
+            sys.stdout.write(output)
+            sys.stdout.flush()
     except subprocess.CalledProcessError as e:
         print(f"Ошибка выполнения команды fastboot: {e.output}")
 
-
-def twrp(method):
+def install_recovery(method):
     try:
-        if method == 1:
-            output = subprocess.check_output(
-                ['fastboot', 'flash', 'recovery_ab', 'recovery.img'], stderr=subprocess.STDOUT, text=True)
-        elif method == 2:
-            output = subprocess.check_output(
-                ['fastboot', 'flash', 'recovery', 'recovery.img'], stderr=subprocess.STDOUT, text=True)
-        print(output)
+        option = 'recovery_ab' if method == 1 else 'recovery'
+        process = subprocess.Popen(['fastboot', 'flash', option, 'recovery.img'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+        while True:
+            output = process.stdout.readline()
+            if not output and process.poll() is not None:
+                break
+            sys.stdout.write(output)
+            sys.stdout.flush()
     except subprocess.CalledProcessError as e:
         print(f"Ошибка выполнения команды fastboot: {e.output}")
 
-
-def main():
-    while active is True:
+def main(active=True):
+    while active:
         print('[1] Посмотреть устройства в FastBoot.\n'
               '[2] Установка Recovery.\n'
               '[3] Установка Ядра.\n'
               '[4] Перезагрузка.\n'
               '[5] Выход.\n')
 
-        answer = input('Ваш выбор: ')
-        answer = int(answer)
-        check_path = os.path.exists(os.path.join(
-            os.path.dirname(__file__), 'fastboot.exe'))
-        if check_path:
-            if answer == 1:
-                run_fastboot_command()
+        choice = input('Ваш выбор: ')
 
-            elif answer == 2:
-                check_path = os.path.exists(os.path.join(
-                    os.path.dirname(__file__), 'images', 'recovery.img'))
-                if check_path:
-                    print('[1] fastboot flash recovery_ab (Рекомендуем).\n'
-                          '[2] fastboot flash recovery (Прошивка в активный слот).\n')
-                    answer = int(input('Ваш выбор: '))
-                    if answer == 1:
-                        twrp(1)
-                    elif answer == 2:
-                        twrp(2)
-                    else:
-                        print('Ошибка! Метод не найден!')
+        if choice == '1':
+            run_fastboot_command()
+        elif choice == '2':
+            recovery_img_path = os.path.join(os.path.dirname(__file__), 'images', 'recovery.img')
+            if check_file_exists(recovery_img_path):
+                print('[1] fastboot flash recovery_ab (Рекомендуем).\n'
+                      '[2] fastboot flash recovery (Прошивка в активный слот).\n')
+                method = input('Ваш выбор: ')
+                if method in ['1', '2']:
+                    install_recovery(int(method))
                 else:
-                    print(
-                        'Ошибка! Образ Recovery не найден. Пожалуйста убедитесь что файл называется recovery.img и находится в папке "images"')
-
+                    print('Ошибка! Метод не найден!')
+            else:
+                print('Ошибка! Образ Recovery не найден. Пожалуйста, убедитесь, что файл называется recovery.img и находится в папке "images"')
+        elif choice == '5':
+            active = False
         else:
-            print('Ошибка! fastboot.exe не найден!')
-
+            print('Ошибка! Неверный выбор!')
 
 if __name__ == "__main__":
     main()
