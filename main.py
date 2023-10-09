@@ -5,7 +5,6 @@ import sys
 def check_file_exists(file_path):
     return os.path.exists(file_path)
 
-
 def run_fastboot_command():
     try:
         process = subprocess.Popen(['fastboot', 'devices'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
