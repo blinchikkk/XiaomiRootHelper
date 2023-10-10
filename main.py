@@ -24,7 +24,8 @@ def run_fastboot_command():
 def install_recovery(method):
     try:
         option = 'recovery_ab' if method == 1 else 'recovery'
-        process = subprocess.Popen(['fastboot', 'flash', option, 'recovery.img'],
+        recovery_img_path = 'images/recovery.img'
+        process = subprocess.Popen(['fastboot', 'flash', option, recovery_img_path],
                                    stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
         while True:
             output = process.stdout.readline()
@@ -39,7 +40,8 @@ def install_recovery(method):
 def install_boot(method):
     try:
         option = 'boot_ab' if method == 1 else 'boot'
-        process = subprocess.Popen(['fastboot', 'flash', option, 'boot.img'],
+        boot_img_path = 'images/boot.img'
+        process = subprocess.Popen(['fastboot', 'flash', option, boot_img_path],
                                    stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
         while True:
             output = process.stdout.readline()
@@ -98,43 +100,25 @@ def main(active=True):
         if choice == '1':
             run_fastboot_command()
         elif choice == '2':
-            recovery_img_path = os.path.join(
-                os.path.dirname(__file__), 'images', 'recovery.img')
-            if check_file_exists(recovery_img_path):
-                print('[1] fastboot flash recovery_ab (Рекомендуем).\n'
-                      '[2] fastboot flash recovery (Прошивка в активный слот).\n')
-                method = input('Ваш выбор: ')
-                if method in ['1', '2']:
-                    install_recovery(int(method))
-                else:
-                    print('Ошибка! Метод не найден!')
+            print('[1] fastboot flash recovery_ab (Рекомендуем).\n'
+                  '[2] fastboot flash recovery (Прошивка в активный слот).\n')
+            method = input('Ваш выбор: ')
+            if method in ['1', '2']:
+                install_recovery(int(method))
             else:
-                print('Ошибка! Образ Recovery не найден. Пожалуйста, убедитесь, что файл называется recovery.img и находится в папке "images"')
-
+                print('Ошибка! Метод не найден!')
         elif choice == '3':
-            boot_img_path = os.path.join(
-                os.path.dirname(__file__), 'images', 'boot.img')
-            if boot_img_path:
-
-                print('[1] fastboot flash boot_ab (Рекомендуем).\n'
-                      '[2] fastboot flash boot (Прошивка в активный слот).\n')
-
-                method = input('Ваш выбор: ')
-
-                if method in ['1', '2']:
-                    install_boot(method)
-                else:
-                    print('Ошибка! Метод не найден!')
+            print('[1] fastboot flash boot_ab (Рекомендуем).\n'
+                  '[2] fastboot flash boot (Прошивка в активный слот).\n')
+            method = input('Ваш выбор: ')
+            if method in ['1', '2']:
+                install_boot(int(method))
             else:
-                print(
-                    'Ошибка! Образ Ядра не найден. Пожалуйста, убедитесь, что файл называется boot.img и находится в папке "images"')
-
+                print('Ошибка! Метод не найден!')
         elif choice == '4':
             print('[1] Перезагрузка с помощью ADB.\n'
-                  '[2] Перезагрузка с помощью FastBoot. (Если усиройство находится в режиме FastBoot)')
-
+                  '[2] Перезагрузка с помощью FastBoot. (Если устройство находится в режиме FastBoot)')
             method = input('Ваш выбор: ')
-
             if method in ['1', '2']:
                 if method == '1':
                     print('[1] Перезагрузка.\n'
@@ -144,14 +128,12 @@ def main(active=True):
                     method = input('Ваш выбор: ')
                     if method in ['1', '2', '3']:
                         reboot(1, method)
-
                 elif method == '2':
                     print('[1] Перезагрузка в систему.\n'
                           '[2] Перезагрузка в Recovery.\n')
                     method = input('Ваш выбор: ')
                     if method in ['1', '2']:
-                       reboot(2, method) 
-
+                        reboot(2, method)
         elif choice == '5':
             active = False
         else:
