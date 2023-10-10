@@ -1,15 +1,60 @@
 import os
 import subprocess
 import sys
-
+from datetime import datetime
 # Функция для получения абсолютного пути к файлу в папке "images"
 
+def create_folder(path, name):
+    full_path = os.path.join(path, name)
 
+    try:
+        os.mkdir(full_path)
+        return os.path.join(full_path, name)
+    
+    except OSError as e:
+        print(f'Ошибка! ({e})')
+        
 def get_absolute_path(filename):
     images_dir = os.path.join(os.path.dirname(__file__), 'images')
     return os.path.join(images_dir, filename)
 
+def make_backup(base_path, section):
+    # Проверяем, существует ли папка "backups"
+    check_backup_folder = os.path.exists(os.path.join(base_path, 'backups'))
+    
+    # Если папки "backups" нет, создаем её
+    if not check_backup_folder:
+        os.mkdir(os.path.join(base_path, 'backups'))
+    
+    # Проверяем, существует ли папка для данной секции
+    check_section_folder = os.path.exists(os.path.join(base_path, 'backups', section))
+    
+    # Если папки для секции нет, создаем её
+    if not check_section_folder:
+        os.mkdir(os.path.join(base_path, 'backups', section))
+    
+    # Создаем путь для сохранения бэкапа с уникальным временным штампом
+    timestamp = datetime.now().strftime("%Y.%m.%d %H:%M:%S")
+    path = os.path.join(base_path, 'backups', section, timestamp)
+    
+    # Запускаем команду fastboot dump
+    command = ['fastboot', 'dump', section, path]
+    process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    
+    # Дождитесь завершения процесса fastboot dump
+    stdout, stderr = process.communicate()
+    
+    # Выведите статус завершения команды
+    print(f"Команда выполнена с кодом возврата: {process.returncode}")
+    
+    # Выведите стандартный вывод и ошибки (если есть)
+    print("Стандартный вывод:")
+    print(stdout.decode())
+    print("Ошибки:")
+    print(stderr.decode())
 
+            
+            
 def check_file_exists(file_path):
     return os.path.exists(file_path)
 
