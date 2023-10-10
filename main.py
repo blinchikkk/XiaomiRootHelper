@@ -140,6 +140,7 @@ def reboot(method, type):
 
 
 def main(active=True):
+    base_path = os.path.dirname(__file__)
     while active:
         print('[1] Посмотреть устройства в FastBoot.\n'
               '[2] Установка Recovery.\n'
@@ -156,6 +157,7 @@ def main(active=True):
                   '[2] fastboot flash recovery (Прошивка в активный слот).\n')
             method = input('Ваш выбор: ')
             if method in ['1', '2']:
+                make_backup(base_path, 'recovery')
                 install_recovery(int(method))
             else:
                 print('Ошибка! Метод не найден!')
@@ -164,6 +166,7 @@ def main(active=True):
                   '[2] fastboot flash boot (Прошивка в активный слот).\n')
             method = input('Ваш выбор: ')
             if method in ['1', '2']:
+                make_backup(base_path, 'boot')
                 install_boot(int(method))
             else:
                 print('Ошибка! Метод не найден!')
