@@ -2,10 +2,13 @@ import os
 import subprocess
 import sys
 
+# Функция для получения абсолютного пути к файлу в папке "images"
+def get_absolute_path(filename):
+    images_dir = os.path.join(os.path.dirname(__file__), 'images')
+    return os.path.join(images_dir, filename)
 
 def check_file_exists(file_path):
     return os.path.exists(file_path)
-
 
 def run_fastboot_command():
     try:
@@ -20,11 +23,10 @@ def run_fastboot_command():
     except subprocess.CalledProcessError as e:
         print(f"Ошибка выполнения команды fastboot: {e.output}")
 
-
 def install_recovery(method):
     try:
         option = 'recovery_ab' if method == 1 else 'recovery'
-        recovery_img_path = 'images/recovery.img'
+        recovery_img_path = get_absolute_path('recovery.img')
         process = subprocess.Popen(['fastboot', 'flash', option, recovery_img_path],
                                    stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
         while True:
@@ -36,11 +38,10 @@ def install_recovery(method):
     except subprocess.CalledProcessError as e:
         print(f"Ошибка выполнения команды fastboot: {e.output}")
 
-
 def install_boot(method):
     try:
         option = 'boot_ab' if method == 1 else 'boot'
-        boot_img_path = 'images/boot.img'
+        boot_img_path = get_absolute_path('boot.img')
         process = subprocess.Popen(['fastboot', 'flash', option, boot_img_path],
                                    stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
         while True:
@@ -51,7 +52,6 @@ def install_boot(method):
             sys.stdout.flush()
     except subprocess.CalledProcessError as e:
         print(f"Ошибка выполнения команды fastboot: {e.output}")
-
 
 def reboot(method, type):
     def return_method(method, type):
@@ -85,7 +85,6 @@ def reboot(method, type):
             sys.stdout.flush()
     except subprocess.CalledProcessError as e:
         print(f"Ошибка выполнения команды fastboot: {e.output}")
-
 
 def main(active=True):
     while active:
@@ -138,7 +137,6 @@ def main(active=True):
             active = False
         else:
             print('Ошибка! Неверный выбор!')
-
 
 if __name__ == "__main__":
     main()
