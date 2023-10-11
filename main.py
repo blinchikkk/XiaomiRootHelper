@@ -14,9 +14,11 @@ def create_folder(path, name):
     except OSError as e:
         print(f'Ошибка! ({e})')
         
+        
 def get_absolute_path(filename):
     images_dir = os.path.join(os.path.dirname(__file__), 'images')
     return os.path.join(images_dir, filename)
+
 
 def make_backup(base_path, section):
     # Проверяем, существует ли папка "backups"
@@ -40,7 +42,7 @@ def make_backup(base_path, section):
     # Запускаем команду fastboot dump
     command = ['fastboot', 'dump', section, path]
     process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    
+    print('Подготовка к бекапу')
     # Дождитесь завершения процесса fastboot dump
     stdout, stderr = process.communicate()
     
@@ -52,9 +54,8 @@ def make_backup(base_path, section):
     print(stdout.decode())
     print("Ошибки:")
     print(stderr.decode())
-
-            
-            
+         
+                     
 def check_file_exists(file_path):
     return os.path.exists(file_path)
 
