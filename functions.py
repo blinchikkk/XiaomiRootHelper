@@ -28,6 +28,7 @@ def make_backup(base_path, section):
         os.mkdir(os.path.join(base_path, 'backups', section))
     
     timestamp = datetime.now().strftime("%Y.%m.%d %H:%M:%S")
+    path = os.path.join(base_path, 'backups', section, timestamp)
     print('Запуск процесса создания дампа...')
     command = ['fastboot', 'dump', section, path]
     process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -94,35 +95,26 @@ def install_boot(method):
         print(f"Ошибка выполнения команды fastboot: {e.output}")
         
         
-def reboot(method, type):
-    def return_method(method, type):
-        option = 'adb' if method == 1 else 'fastboot'
-        reboot_type = None
-        if method == 1:
-            if type == 2:
-                reboot_type = 'fastboot'
-            elif type == 3:
-                reboot_type = 'recovery'
-            else:
-                reboot_type = ''
-        else:
-            if type == 2:
-                reboot_type = 'recovery'
-            else:
-                reboot_type = ''
-
-        return [option, reboot_type]
-
+def reboot(method):
+    commands = {
+    '1': ['adb', 'reboot'],
+    '2': ['fastboot', 'reboot'],
+    '3': ['fastboot', 'reboot', 'recovery'],
+    '4': ['adb', 'reboot', 'recovery'],
+    '5': ['adb', 'reboot', 'fastboot']
+    }
+    
+    if str(method) in commands:
+        command = commands[method]
+    else:
+        command = ['fastboot', 'reboot']
+        
     try:
-        option = return_method(method, type)[0]
-        reboot_location = return_method(method, type)[1]
-
-        process = subprocess.Popen([option, reboot_location])
-        while True:
-            output = process.stdout.readline()
-            if not output and process.poll() is not None:
-                break
+        process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+        for output in process.stdout:
             sys.stdout.write(output)
             sys.stdout.flush()
+        
+        process.wait()
     except subprocess.CalledProcessError as e:
-        print(f"Ошибка выполнения команды fastboot: {e.output}")
+        print(f"Ошибка выполнения команды: {e.output}")

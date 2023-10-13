@@ -1,79 +1,54 @@
 import os
-import subprocess
-import sys
-from datetime import datetime
-# Функция для получения абсолютного пути к файлу в папке "images"
-
-
-def run_fastboot_command():
-    try:
-        process = subprocess.Popen(
-            ['fastboot', 'devices'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
-        while True:
-            output = process.stdout.readline()
-            if not output and process.poll() is not None:
-                break
-            sys.stdout.write(output)
-            sys.stdout.flush()
-    except subprocess.CalledProcessError as e:
-        print(f"Ошибка выполнения команды fastboot: {e.output}")
-
-
-
-
-
-
-
-
-
-
-
-def main(active=True):
+from functions import fb_devices, make_backup, install_recovery, \
+    install_boot, reboot
+from messages import * 
+def main():
     base_path = os.path.dirname(__file__)
-    while active:
+    
+    while True:
         print('[1] Посмотреть устройства в FastBoot.\n'
               '[2] Установка Recovery.\n'
               '[3] Установка Ядра.\n'
               '[4] Перезагрузка.\n'
               '[5] Выход.\n')
-
-        choice = input('Ваш выбор: ')
-
+        
+        choice = input('Ваш выбор >> ')
+        
+        if choice == '1':
+            fb_devices()
+        elif choice == '2':
+            print(fastboot_choise_2_first)
+            
+            choice = input('Ваш выбор >> ')
+            if choice in ['1', '2']:
                 
-
-        elif choice == '3':
-            print('[1] fastboot flash boot_ab (Рекомендуем).\n'
-                  '[2] fastboot flash boot (Прошивка в активный слот).\n')
-            method = input('Ваш выбор: ')
-            if method in ['1', '2']:
-                make_backup(base_path, 'boot')
-                install_boot(int(method))
+                make_backup(base_path=base_path, section='recovery')
+                install_recovery(int(choice))
             else:
-                print()
+                print(method_error)
+            
+        elif choice == '3':
+            print(fastboot_choise_3_first)
+            choice = input('Ваш выбор >> ')
+            
+            if choice in ['1', '2']:
+                make_backup(base_path=base_path, section='boot')
+                install_boot(int(choice))
+            else:
+                print(method_error)
         elif choice == '4':
-            print('[1] Перезагрузка с помощью ADB.\n'
-                  '[2] Перезагрузка с помощью FastBoot. (Если устройство находится в режиме FastBoot)')
-            method = input('Ваш выбор: ')
-            if method in ['1', '2']:
-                if method == '1':
-                    print('[1] Перезагрузка.\n'
-                          '[2] Перезагрузка в FastBoot.\n'
-                          '[3] Перезагрузка в Recovery.\n')
-                    del method
-                    method = input('Ваш выбор: ')
-                    if method in ['1', '2', '3']:
-                        reboot(1, method)
-                elif method == '2':
-                    print('[1] Перезагрузка в систему.\n'
-                          '[2] Перезагрузка в Recovery.\n')
-                    method = input('Ваш выбор: ')
-                    if method in ['1', '2']:
-                        reboot(2, method)
+            print(reboot_message_first)
+            choice = input('Ваш выбор >> ')
+            
+            if choice in ['1','2','3','4','5']:
+                reboot(choice)
         elif choice == '5':
-            active = False
+            break
+        
         else:
-            print('Ошибка! Неверный выбор!')
-
-
-if __name__ == "__main__":
+            print(method_error)
+            
+            
+if __name__ == '__main__':
     main()
+    
