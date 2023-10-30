@@ -123,11 +123,11 @@ def reboot(method):
 def unlock_bootloader():
     try:
         if os.name == 'nt':
-            os.system('cd mtkclient')
+            os.system('cd mediatek_client')
             process = subprocess.Popen(['python', 'mtk', 'da','seccfg', 'unlock'], 
                                        stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
         else:
-            process = subprocess.Popen(['cd', 'mtkclient', '&&', 'python3', 'mtk', 'da', 'seccfg', 'unlock'],
+            process = subprocess.Popen(['cd', 'mediatek_client', '&&', 'python3', 'mtk', 'da', 'seccfg', 'unlock'],
                                     stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
         
         while True:
@@ -136,6 +136,6 @@ def unlock_bootloader():
                 break
             sys.stdout.write(output)
             sys.stdout.flush()
-            
+
     except subprocess.CalledProcessError as e:
         print(f"Ошибка выполнения команды fastboot: {e.output}")
