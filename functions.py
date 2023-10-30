@@ -118,3 +118,24 @@ def reboot(method):
         process.wait()
     except subprocess.CalledProcessError as e:
         print(f"Ошибка выполнения команды: {e.output}")
+
+
+def unlock_bootloader():
+    try:
+        if os.name == 'nt':
+            os.system('cd mtkclient')
+            process = subprocess.Popen(['python', 'mtk', 'da','seccfg', 'unlock'], 
+                                       stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+        else:
+            process = subprocess.Popen(['cd', 'mtkclient', '&&', 'python3', 'mtk', 'da', 'seccfg', 'unlock'],
+                                    stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+        
+        while True:
+            output = process.stdout.readline()
+            if not output and process.poll() is not None:
+                break
+            sys.stdout.write(output)
+            sys.stdout.flush()
+            
+    except subprocess.CalledProcessError as e:
+        print(f"Ошибка выполнения команды fastboot: {e.output}")
