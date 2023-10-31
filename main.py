@@ -1,5 +1,5 @@
 import os
-from functions import fb_devices, make_backup, install_recovery, \
+from functions import fb_devices, install_recovery, \
     install_boot, reboot, unlock_bootloader
 from messages import *
 from colorama import init, Fore, Back, Style
@@ -47,7 +47,6 @@ def main():
             choice = input('Ваш выбор >> ')
             if choice in ['1', '2']:
                 
-                make_backup(base_path=base_path, section='recovery')
                 install_recovery(int(choice))
             else:
                 print(method_error)
@@ -57,7 +56,6 @@ def main():
             choice = input('Ваш выбор >> ')
             
             if choice in ['1', '2']:
-                make_backup(base_path=base_path, section='boot')
                 install_boot(int(choice))
             else:
                 print(method_error)

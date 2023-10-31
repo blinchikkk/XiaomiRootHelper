@@ -17,31 +17,7 @@ def fb_devices():
         print(f"Ошибка выполнения команды fastboot: {e.output}")
         
 
-def make_backup(base_path, section):
-    check_backup_folder = os.path.exists(os.path.join(base_path, 'backups'))
-    check_section_folder = os.path.exists(os.path.join(base_path, 'backups', section))
-    
-    if not check_backup_folder:
-        os.mkdir(os.path.join(base_path, 'backups'))
-        
-    if not check_section_folder:
-        os.mkdir(os.path.join(base_path, 'backups', section))
-    
-    timestamp = datetime.now().strftime("%Y.%m.%d %H:%M:%S")
-    path = os.path.join(base_path, 'backups', section, timestamp)
-    print('Запуск процесса создания дампа...')
-    command = ['fastboot', 'dump', section, path]
-    process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    
-    stdout, stderr = process.communicate()
-    
-    print(f"Команда выполнена с кодом возврата: {process.returncode}")
-    
-    print("Стандартный вывод:")
-    print(stdout.decode())
-    print("Ошибки:")
-    print(stderr.decode())
-    
+
     
 def check_file_exists(file_path):
     return os.path.exists(file_path)
