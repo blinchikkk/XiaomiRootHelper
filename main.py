@@ -1,14 +1,13 @@
 import os
-from functions import fb_devices, install_recovery, \
-    install_boot, reboot, unlock_bootloader
+from functions import *
 from messages import *
-from colorama import init, Fore, Back, Style
+from colorama import init, Fore, Style
 
 init()
 
 def return_text():
     platform_name = 'Windows' if os.name == 'nt' else 'Linux'
-    version = "v.1.2.0"
+    version = "v.1.1.0"
 
     text = f"""{Fore.CYAN}
 $$\   $$\ $$\                                   $$\ $$$$$$$\  $$\   $$\ 
@@ -37,45 +36,45 @@ def main():
               '[10] Выход.\n')
         
         choice = input('Ваш выбор >> ')
-#----------------------------------------------------
+        
         if choice == '1':
             fb_devices()
-#----------------------------------------------------
         elif choice == '2':
             print(fastboot_choise_2_first)
-            
             choice = input('Ваш выбор >> ')
             if choice in ['1', '2']:
-                
                 install_recovery(int(choice))
             else:
                 print(method_error)
-#----------------------------------------------------
         elif choice == '3':
             print(fastboot_choise_3_first)
             choice = input('Ваш выбор >> ')
-            
             if choice in ['1', '2']:
                 install_boot(int(choice))
             else:
                 print(method_error)
-#----------------------------------------------------
         elif choice == '4':
             print(instruments_menu)
-            choice = input('Ваш выбор >> ')
-
+            choice = int(input('Ваш выбор >> '))  # Преобразовал ввод в целое число
             if choice == 1:
                 unlock_bootloader()
             elif choice == 2:
-                print('In developing...')
-#----------------------------------------------------
+                print(erase_menu)
+                method = input('Ваш выбор >> ')
+                erase(method)
+            elif choice == 3:
+                device_info()
+            elif choice == 4:
+                check_bootloader_status()
+            else:
+                print(method_error)
         elif choice == '5':
             print(reboot_message_first)
             choice = input('Ваш выбор >> ')
-            
             if choice in ['1','2','3','4','5']:
                 reboot(choice)
-#----------------------------------------------------
+            else:
+                print(method_error)
         elif choice == '10':
             break
         else:
@@ -84,4 +83,3 @@ def main():
             
 if __name__ == '__main__':
     main()
-    

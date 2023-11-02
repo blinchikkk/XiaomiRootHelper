@@ -115,3 +115,59 @@ def unlock_bootloader():
 
     except subprocess.CalledProcessError as e:
         print(f"Ошибка выполнения команды fastboot: {e.output}")
+
+
+def erase(selection):
+    erase_commands_list = {
+    '1': 'system',
+    '2': 'userdata',
+    '3':'recovery',
+    '4': 'boot',
+    '5': 'cache',
+    '6': 'radio',
+    '7': 'data'}
+    
+    method = erase_commands_list[str(selection)]
+    if method not in erase_commands_list['7']:
+        process = subprocess.Popen(['fastboot', 'erase', method],
+                                    stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+        
+    else:
+        process = subprocess.Popen(['fastboot', 'erase', '-w'],
+                                    stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+        
+
+    while True:
+            output = process.stdout.readline()
+            if not output and process.poll() is not None:
+                break
+            sys.stdout.write(output)
+            sys.stdout.flush()
+
+        
+def device_info():
+    try:
+        process = subprocess.Popen(['fastboot', 'getvar' 'all'],
+                                   stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+        while True:
+            output = process.stdout.readline()
+            if not output and process.poll() is not None:
+                break
+            sys.stdout.write(output)
+            sys.stdout.flush()
+    except subprocess.CalledProcessError as e:
+        print(f"Ошибка выполнения команды fastboot: {e.output}")
+        
+def check_bootloader_status():
+    try:
+        process = subprocess.Popen(['fastboot', 'oem' 'device-info'],
+                                   stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+        
+        while True:
+            output = process.stdout.readline()
+            if not output and process.poll() is not None:
+                break
+            sys.stdout.write(output)
+            sys.stdout.flush()
+    except subprocess.CalledProcessError as e:
+        print(f"Ошибка выполнения команды fastboot: {e.output}")
